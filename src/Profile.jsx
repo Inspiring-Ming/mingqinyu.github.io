@@ -106,7 +106,12 @@ export default function Portfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [visibleSections, setVisibleSections] = useState(new Set());
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const galleryRef = React.useRef(null);
+  const isScrollingRef = React.useRef(false);
+  const scrollTimeoutRef = React.useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -162,15 +167,141 @@ export default function Portfolio() {
     setIsDark(!isDark);
   };
 
+  const updateScrollButtons = () => {
+    if (galleryRef.current) {
+      // Always show both arrows for circular navigation
+      setCanScrollLeft(true);
+      setCanScrollRight(true);
+
+      // Calculate which project is currently in view
+      const gallery = galleryRef.current;
+      const { scrollLeft, scrollWidth } = gallery;
+      const projectSetWidth = scrollWidth / 3;
+      const singleProjectWidth = projectSetWidth / CONFIG.projects.length;
+
+      // Calculate relative scroll position within the middle set
+      const relativeScroll = ((scrollLeft % projectSetWidth) + projectSetWidth) % projectSetWidth;
+      const index = Math.round(relativeScroll / singleProjectWidth) % CONFIG.projects.length;
+
+      setCurrentProjectIndex(index);
+    }
+  };
+
+  useEffect(() => {
+    const gallery = galleryRef.current;
+    if (gallery) {
+      // Initial update
+      updateScrollButtons();
+      // Update again after a short delay to ensure content is loaded
+      const timeoutId = setTimeout(updateScrollButtons, 100);
+
+      gallery.addEventListener('scroll', updateScrollButtons);
+      window.addEventListener('resize', updateScrollButtons);
+
+      return () => {
+        clearTimeout(timeoutId);
+        gallery.removeEventListener('scroll', updateScrollButtons);
+        window.removeEventListener('resize', updateScrollButtons);
+      };
+    }
+  }, []);
+
   const scrollGallery = (direction) => {
     if (galleryRef.current) {
+      const gallery = galleryRef.current;
       const scrollAmount = 800;
-      galleryRef.current.scrollBy({
+
+      gallery.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
       });
     }
   };
+
+  const scrollToProject = (index) => {
+    if (galleryRef.current) {
+      const gallery = galleryRef.current;
+      const { scrollWidth } = gallery;
+      const projectSetWidth = scrollWidth / 3;
+      const singleProjectWidth = projectSetWidth / CONFIG.projects.length;
+
+      // Scroll to the project in the middle set
+      const targetScroll = projectSetWidth + (index * singleProjectWidth);
+
+      gallery.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Handle infinite loop by detecting when we reach the end/beginning
+  const handleInfiniteScroll = () => {
+    if (galleryRef.current && !isScrollingRef.current) {
+      const gallery = galleryRef.current;
+      const { scrollWidth } = gallery;
+
+      // Calculate the width of one set of projects
+      const projectSetWidth = scrollWidth / 3; // We have 3 sets (original + 2 clones)
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Wait for scroll to stop before checking position
+      scrollTimeoutRef.current = setTimeout(() => {
+        const currentScroll = gallery.scrollLeft;
+
+        // If scrolled past the second set (too far right), instantly reposition to first set
+        if (currentScroll >= projectSetWidth * 2 - 50) {
+          isScrollingRef.current = true;
+          gallery.scrollTo({
+            left: currentScroll - projectSetWidth,
+            behavior: 'instant'
+          });
+          setTimeout(() => {
+            isScrollingRef.current = false;
+          }, 50);
+        }
+        // If scrolled before the first set (too far left), instantly reposition to second set
+        else if (currentScroll <= 50) {
+          isScrollingRef.current = true;
+          gallery.scrollTo({
+            left: currentScroll + projectSetWidth,
+            behavior: 'instant'
+          });
+          setTimeout(() => {
+            isScrollingRef.current = false;
+          }, 50);
+        }
+      }, 50);
+    }
+  };
+
+  useEffect(() => {
+    const gallery = galleryRef.current;
+    if (gallery) {
+      // Initial position to middle set
+      const timeoutId = setTimeout(() => {
+        const projectSetWidth = gallery.scrollWidth / 3;
+        gallery.scrollTo({
+          left: projectSetWidth,
+          behavior: 'instant'
+        });
+      }, 150);
+
+      gallery.addEventListener('scroll', handleInfiniteScroll);
+
+      return () => {
+        clearTimeout(timeoutId);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+        gallery.removeEventListener('scroll', handleInfiniteScroll);
+      };
+    }
+  }, []);
 
   const projects = CONFIG.projects;
 
@@ -672,6 +803,13 @@ export default function Portfolio() {
           font-weight: 400;
           color: var(--text-primary);
           letter-spacing: -3px;
+          text-decoration: none;
+          cursor: pointer;
+          transition: opacity 0.3s ease;
+        }
+
+        nav .logo:hover {
+          opacity: 0.7;
         }
 
 
@@ -804,7 +942,7 @@ export default function Portfolio() {
         /* Gallery Section */
         .gallery-section {
           min-height: 100vh;
-          padding: 80px 60px 100px;
+          padding: 80px 60px 80px;
           max-width: 100%;
           margin: 0 auto;
           scroll-snap-align: start;
@@ -812,6 +950,95 @@ export default function Portfolio() {
           background: transparent;
           position: relative;
           overflow: visible;
+        }
+
+        /* Side Navigation Arrows */
+        .gallery-side-nav {
+          position: absolute;
+          top: 55%;
+          transform: translateY(-50%);
+          z-index: 100;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: rgba(255, 200, 0, 0.6);
+          backdrop-filter: blur(10px);
+          border: 2px solid rgba(255, 200, 0, 0.8);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          opacity: 0;
+          pointer-events: none;
+          box-shadow: 0 4px 20px rgba(255, 200, 0, 0.3);
+        }
+
+        .gallery-side-nav.visible {
+          opacity: 1;
+          pointer-events: all;
+        }
+
+        .gallery-side-nav:hover {
+          background: rgba(255, 200, 0, 0.9);
+          transform: translateY(-50%) scale(1.1);
+          box-shadow: 0 6px 30px rgba(255, 200, 0, 0.5);
+        }
+
+        .gallery-side-nav:active {
+          transform: translateY(-50%) scale(0.95);
+        }
+
+        .gallery-side-nav-left {
+          left: 20px;
+        }
+
+        .gallery-side-nav-right {
+          right: 20px;
+        }
+
+        .gallery-side-nav svg {
+          width: 28px;
+          height: 28px;
+          color: #1a1a1a;
+          transition: transform 0.3s;
+        }
+
+        .gallery-side-nav:hover svg {
+          transform: scale(1.2);
+        }
+
+        /* Project Navigation Dots */
+        .project-dots {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 12px;
+          margin-top: 15px;
+          margin-bottom: 20px;
+          padding: 20px;
+        }
+
+        .project-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: var(--border-color);
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 2px solid transparent;
+        }
+
+        .project-dot:hover {
+          background: var(--text-tertiary);
+          transform: scale(1.2);
+        }
+
+        .project-dot.active {
+          background: var(--accent-primary);
+          border-color: var(--accent-dark);
+          transform: scale(1.3);
+          box-shadow: 0 2px 12px rgba(255, 200, 0, 0.4);
         }
 
         .gallery-header {
@@ -1262,7 +1489,7 @@ export default function Portfolio() {
           }
 
           .gallery-section {
-            padding: 80px 30px 100px;
+            padding: 70px 30px 70px;
           }
 
           .projects-list {
@@ -1291,7 +1518,7 @@ export default function Portfolio() {
           }
 
           .gallery-section {
-            padding: 80px 40px 100px;
+            padding: 70px 40px 70px;
           }
 
           .projects-list {
@@ -1365,7 +1592,7 @@ export default function Portfolio() {
           }
 
           .gallery-section {
-            padding: 60px 30px 80px;
+            padding: 60px 30px 60px;
           }
 
           .projects-list {
@@ -1404,6 +1631,37 @@ export default function Portfolio() {
             padding-left: 10px;
             padding-right: 10px;
             gap: 20px;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .gallery-side-nav {
+            width: 50px;
+            height: 50px;
+          }
+
+          .gallery-side-nav-left {
+            left: 10px;
+          }
+
+          .gallery-side-nav-right {
+            right: 10px;
+          }
+
+          .gallery-side-nav svg {
+            width: 24px;
+            height: 24px;
+          }
+
+          .project-dots {
+            gap: 10px;
+            margin-top: 30px;
+            padding: 15px;
+          }
+
+          .project-dot {
+            width: 10px;
+            height: 10px;
           }
         }
 
@@ -1450,7 +1708,7 @@ export default function Portfolio() {
           }
 
           .gallery-section {
-            padding: 60px 20px;
+            padding: 60px 20px 60px;
           }
 
           .gallery-header {
@@ -1621,7 +1879,7 @@ export default function Portfolio() {
       {/* Navigation */}
       <nav>
         <div className="container">
-          <div className="logo">Mingqin Yu</div>
+          <a href="#" className="logo">Mingqin Yu</a>
           <ul>
             <li><a href="#projects">PROJECTS</a></li>
             <li><a href="#contact">CONTACT</a></li>
@@ -1717,6 +1975,26 @@ export default function Portfolio() {
 
       {/* Gallery Section */}
       <div className={`gallery-section ${visibleSections.has('projects') ? 'visible' : ''}`} id="projects">
+        {/* Side Navigation Arrows */}
+        <button
+          onClick={() => scrollGallery('left')}
+          className={`gallery-side-nav gallery-side-nav-left ${canScrollLeft ? 'visible' : ''}`}
+          aria-label="Scroll left"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => scrollGallery('right')}
+          className={`gallery-side-nav gallery-side-nav-right ${canScrollRight ? 'visible' : ''}`}
+          aria-label="Scroll right"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
         <div className="gallery-header">
           <div>
             <h2>Projects</h2>
@@ -1737,8 +2015,29 @@ export default function Portfolio() {
         </div>
 
         <div className="projects-list" ref={galleryRef}>
+          {/* Clone set - end items for seamless left scroll */}
           {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
+            <ProjectCard key={`clone-end-${project.id}`} project={project} index={index} />
+          ))}
+          {/* Original set */}
+          {projects.map((project, index) => (
+            <ProjectCard key={`original-${project.id}`} project={project} index={index} />
+          ))}
+          {/* Clone set - start items for seamless right scroll */}
+          {projects.map((project, index) => (
+            <ProjectCard key={`clone-start-${project.id}`} project={project} index={index} />
+          ))}
+        </div>
+
+        {/* Project Navigation Dots */}
+        <div className="project-dots">
+          {projects.map((project, index) => (
+            <div
+              key={`dot-${project.id}`}
+              className={`project-dot ${currentProjectIndex === index ? 'active' : ''}`}
+              onClick={() => scrollToProject(index)}
+              aria-label={`Go to project ${index + 1}`}
+            />
           ))}
         </div>
       </div>
