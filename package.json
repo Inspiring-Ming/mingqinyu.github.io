@@ -2,7 +2,7 @@
   "name": "yuyu-profile",
   "version": "1.0.0",
   "description": "Personal profile page for Mingqin Yu",
-  "homepage": "https://yourusername.github.io/yuyu_profile",
+  "homepage": ".",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

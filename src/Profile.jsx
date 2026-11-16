@@ -7,95 +7,106 @@ import React, { useState, useEffect } from 'react';
 const CONFIG = {
   // Personal Information
   name: "Mingqin Yu",
-  title: "PhD Researcher | Software Engineering | ESG Reporting",
-  email: "your.email@university.edu",
+  title: "AI Engineer | LLM Agents & Evaluation | ESG and Financial Risk Data",
+  email: "mingchin.yuyu@gmail.com",
 
   // About Me Text
-  aboutText: "I am a PhD researcher specializing in software engineering solutions for Environmental, Social, and Governance (ESG) reporting. My work focuses on developing scalable, automated systems for ESG data collection, analysis, and disclosure that comply with emerging regulatory frameworks. With a strong foundation in computer science and a passion for sustainability, I create innovative tools that bridge the gap between technology and responsible business practices.",
+  aboutText: "I build and test LLM tools, RAG systems and tool-calling agents. My PhD in Computer Science at UNSW, on an industry programme with Cognitivo and Westpac, built reusable data models and AI prototypes for ESG and financial risk data, with every figure traceable to its source. I care most about checking what AI produces: evaluation, repeat runs and human-checked samples before a result is trusted. I have taught machine learning, NLP and software engineering at UNSW and the University of Sydney.",
 
   // Profile Photo (leave empty string for placeholder icon)
-  profilePhoto: "", // Add your photo URL here: "https://example.com/your-photo.jpg"
+  profilePhoto: "",
 
   // Social Links
   socialLinks: {
-    googleScholar: "https://scholar.google.com/",
-    linkedin: "https://linkedin.com/in/yourprofile",
-    github: "https://github.com/yourusername"
+    googleScholar: "https://scholar.google.com/citations?user=1nRQ9twAAAAJ&hl=en",
+    linkedin: "https://www.linkedin.com/in/mingqin-yu/",
+    github: "https://github.com/Inspiring-Ming"
   },
 
-  // Projects - Add your project images here
+  // Projects (all link to real repositories; demo is optional)
   projects: [
     {
       id: 1,
-      title: "ESG-Analyzer Platform",
-      url: "github.com/yourusername/esg-analyzer",
-      description: "An open-source platform enabling organizations to analyze and benchmark ESG performance against industry peers. Incorporates advanced NLP for automated report analysis and machine learning models for trend prediction.",
-      tags: ["Python", "Machine Learning", "NLP", "Open Source", "TensorFlow"],
-      github: "https://github.com/yourusername/esg-analyzer",
-      demo: "#",
-      image: "", // Add image URL here: "https://example.com/project1.jpg"
-      imageColor: "#4f46e5" // Fallback color if no image
+      title: "Reporting Agent for ESG",
+      url: "github.com/Inspiring-Ming/Reporting-Agent-for-ESG",
+      description: "Grounded RAG and tool-calling agent with provenance and full call tracing: the pattern for LLM systems that must be auditable in regulated settings. Each answer shows whether it came from the data or from the model.",
+      tags: ["Python", "Anthropic API", "RAG", "Tool Calling", "SQLite", "Docker", "pytest"],
+      github: "https://github.com/Inspiring-Ming/Reporting-Agent-for-ESG",
+      demo: "https://inspiring-ming.github.io/Reporting-Agent-for-ESG/",
+      image: "",
+      imageColor: "#4f46e5"
     },
     {
       id: 2,
-      title: "Climate Disclosure Compliance Checker",
-      url: "github.com/yourusername/tcfd-checker",
-      description: "Automated validation tool for corporate climate disclosures against TCFD recommendations. Uses rule-based engines combined with semantic analysis to identify reporting gaps and ensure compliance.",
-      tags: ["TCFD", "Regulatory Tech", "Semantic Analysis", "Python"],
-      github: "https://github.com/yourusername/tcfd-checker",
-      demo: "#",
+      title: "AI Agent for ESG Portfolios",
+      url: "github.com/Inspiring-Ming/AI-Agent-for-ESG",
+      description: "ESG portfolio agent for carbon-intensity analysis and pre-trade compliance checks, built on MCP servers behind a FastAPI service. Trades that break the rules wait for a second approver.",
+      tags: ["Claude", "MCP", "FastAPI", "Docker", "Agents"],
+      github: "https://github.com/Inspiring-Ming/AI-Agent-for-ESG",
+      demo: "",
       image: "",
       imageColor: "#059669"
     },
     {
       id: 3,
-      title: "Blockchain for Supply Chain ESG",
-      url: "research-publication.com/blockchain-esg",
-      description: "Research on applying blockchain technology to create immutable, transparent ESG metric records throughout supply chains. Enables more reliable Scope 3 emissions reporting and enhances supply chain sustainability visibility.",
-      tags: ["Blockchain", "Supply Chain", "Ethereum", "Smart Contracts"],
-      github: "#",
-      demo: "#",
-      image: "",
-      imageColor: "#dc2626"
-    },
-    {
-      id: 4,
-      title: "ESG Data Quality Framework",
-      url: "github.com/yourusername/esg-quality",
-      description: "Comprehensive framework for assessing ESG data quality, completeness, and reliability. Addresses key challenges in sustainability reporting through systematic validation methods and quality metrics.",
-      tags: ["Data Quality", "Validation", "Standards", "TypeScript"],
-      github: "https://github.com/yourusername/esg-quality",
-      demo: "#",
+      title: "ESG Metric Knowledge Graph",
+      url: "github.com/Inspiring-Ming/ESG-Metric-KG-System",
+      description: "RDF knowledge graph for ESG metric computation: ontology-driven modelling with SASB framework support and provenance back to the source. Published at IEEE ICWS 2026.",
+      tags: ["Knowledge Graphs", "RDF", "Ontology", "Python"],
+      github: "https://github.com/Inspiring-Ming/ESG-Metric-KG-System",
+      demo: "",
       image: "",
       imageColor: "#7c3aed"
     },
     {
+      id: 4,
+      title: "Quantifying Materiality Misalignment Risk",
+      url: "github.com/Inspiring-Ming/Quantifying-Materiality-Misalignment-Risk-",
+      description: "LLM-assisted scoring of 20 sustainability reports from four Australian banks (2021-2025) against SASB. Model comparison, weight and prompt ablations, three-run stability checks and a 30-pair human validation.",
+      tags: ["LLM Evaluation", "LLM-as-a-Judge", "Python"],
+      github: "https://github.com/Inspiring-Ming/Quantifying-Materiality-Misalignment-Risk-",
+      demo: "https://inspiring-ming.github.io/Quantifying-Materiality-Misalignment-Risk-/",
+      image: "",
+      imageColor: "#dc2626"
+    },
+    {
       id: 5,
-      title: "Deep Learning for ESG Text Analysis",
-      url: "papers.icml.cc/esg-transformers",
-      description: "Advanced deep learning models using transformer architectures for automated ESG information extraction from unstructured corporate documents. Achieves state-of-the-art accuracy in ESG disclosure analysis.",
-      tags: ["Deep Learning", "Transformers", "BERT", "PyTorch"],
-      github: "https://github.com/yourusername/esg-transformers",
-      demo: "#",
+      title: "ESG Data Analysis at Scale",
+      url: "github.com/Inspiring-Ming/DataAnalysis_SQL-ML",
+      description: "End-to-end data science on 6.6 million ESG observations: cleaning, PCA, KMeans clustering and disclosure-gap analysis, with a Streamlit dashboard and SQL console.",
+      tags: ["Python", "SQL", "PCA", "Clustering", "Streamlit"],
+      github: "https://github.com/Inspiring-Ming/DataAnalysis_SQL-ML",
+      demo: "https://huggingface.co/spaces/Inspiring-Ming/esg-landscape-explorer",
       image: "",
       imageColor: "#0891b2"
     },
     {
       id: 6,
-      title: "Real-time ESG Monitoring Dashboard",
-      url: "esg-dashboard.com",
-      description: "Interactive dashboard for continuous ESG performance monitoring with real-time alerts and predictive analytics. Scalable architecture supporting enterprise-level deployments with React and WebSocket integration.",
-      tags: ["React", "Real-time", "Data Visualization", "WebSocket"],
-      github: "#",
-      demo: "#",
+      title: "Deep-Learning Sentiment Classifier",
+      url: "github.com/Inspiring-Ming/imdb-sentiment-dl",
+      description: "Word2Vec embeddings with neural classifiers on 50,000 movie reviews, reaching 0.84 F1. Containerised pipeline with tests.",
+      tags: ["Deep Learning", "NLP", "TensorFlow", "Keras"],
+      github: "https://github.com/Inspiring-Ming/imdb-sentiment-dl",
+      demo: "https://inspiring-ming.github.io/imdb-sentiment-dl/",
       image: "",
       imageColor: "#ea580c"
+    },
+    {
+      id: 7,
+      title: "NewsImpact",
+      url: "github.com/Inspiring-Ming/NewsImpact",
+      description: "News impact on business and markets: storylines, evidence and market reactions for US and ASX companies. Every pull request runs tests, type checks and a Docker smoke test in GitHub Actions.",
+      tags: ["Python", "LLMs", "GitHub Actions", "Docker"],
+      github: "https://github.com/Inspiring-Ming/NewsImpact",
+      demo: "",
+      image: "",
+      imageColor: "#0f766e"
     }
   ],
 
   // Footer
-  footerText: "PhD Researcher | Software Engineering | ESG Reporting",
-  copyright: "© 2025 Mingqin Yu. All rights reserved."
+  footerText: "AI Engineer | LLM Agents & Evaluation | ESG and Financial Risk Data",
+  copyright: "© 2026 Mingqin Yu. All rights reserved."
 };
 
 // ==========================================
@@ -356,13 +367,13 @@ export default function Portfolio() {
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
               </a>
-              <a href={project.demo} target="_blank" rel="noopener noreferrer" className="project-icon-link">
+              {project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" className="project-icon-link">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                   <polyline points="15 3 21 3 21 9"></polyline>
                   <line x1="10" y1="14" x2="21" y2="3"></line>
                 </svg>
-              </a>
+              </a>}
             </div>
           </div>
         </div>
